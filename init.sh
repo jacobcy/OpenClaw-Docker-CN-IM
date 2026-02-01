@@ -15,6 +15,10 @@ if [ ! -f /home/node/.openclaw/openclaw.json ]; then
     MODEL_ID="${MODEL_ID}"
     BASE_URL="${BASE_URL}"
     API_KEY="${API_KEY}"
+    API_PROTOCOL="${API_PROTOCOL:-openai-completions}"
+    CONTEXT_WINDOW="${CONTEXT_WINDOW:-200000}"
+    MAX_TOKENS="${MAX_TOKENS:-8192}"
+    
     TELEGRAM_BOT_TOKEN="${TELEGRAM_BOT_TOKEN}"
     FEISHU_APP_ID="${FEISHU_APP_ID}"
     FEISHU_APP_SECRET="${FEISHU_APP_SECRET}"
@@ -48,7 +52,7 @@ if [ ! -f /home/node/.openclaw/openclaw.json ]; then
       "default": {
         "baseUrl": "$BASE_URL",
         "apiKey": "$API_KEY",
-        "api": "openai-completions",
+        "api": "$API_PROTOCOL",
         "models": [
           {
             "id": "$MODEL_ID",
@@ -61,8 +65,8 @@ if [ ! -f /home/node/.openclaw/openclaw.json ]; then
               "cacheRead": 0,
               "cacheWrite": 0
             },
-            "contextWindow": 200000,
-            "maxTokens": 8192
+            "contextWindow": $CONTEXT_WINDOW,
+            "maxTokens": $MAX_TOKENS
           }
         ]
       }
@@ -351,6 +355,10 @@ chown -R node:node /home/node/.openclaw
 
 echo "=== 初始化完成 ==="
 echo "当前使用模型: default/$MODEL_ID"
+echo "API 协议: ${API_PROTOCOL:-openai-completions}"
+echo "Base URL: ${BASE_URL}"
+echo "上下文窗口: ${CONTEXT_WINDOW:-200000}"
+echo "最大 Tokens: ${MAX_TOKENS:-8192}"
 echo "Gateway 端口: $OPENCLAW_GATEWAY_PORT"
 echo "Gateway 绑定: $OPENCLAW_GATEWAY_BIND"
 

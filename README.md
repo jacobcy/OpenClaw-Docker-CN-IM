@@ -1,8 +1,64 @@
 # OpenClaw-Docker-CN-IM
 
+> 🚀 **推荐搭配**：OpenClaw 功能强大但 Token 消耗较大，推荐配合 [AIClient-2-API](https://github.com/justlovemaki/AIClient-2-API) 项目使用，将各大 AI 客户端转换为标准 API 接口，实现无限 Token 调用，彻底解决 Token 焦虑！本项目已支持 OpenAI 和 Claude 两种协议，可直接对接 AIClient-2-API 服务。
+
 **OpenClaw 中国IM插件整合版 Docker 镜像**
 
 本项目是 OpenClaw 的中国IM平台整合Docker版本，预装并配置了飞书、钉钉、QQ机器人、企业微信等主流中国IM软件的插件，让您可以快速部署一个支持多个中国IM平台的 AI 机器人网关。
+
+## Docker 镜像地址
+
+### 🐳 Docker Hub
+- **仓库地址**: https://hub.docker.com/r/justlikemaki/openclaw-docker-cn-im
+- **拉取命令**:
+  ```bash
+  docker pull justlikemaki/openclaw-docker-cn-im:1.0.0
+  docker pull justlikemaki/openclaw-docker-cn-im:latest
+  ```
+
+## 快速开始
+
+### 使用 Docker Compose（推荐）
+
+1. **下载配置文件**
+   ```bash
+   # 下载 docker-compose.yml 和 .env.example
+   wget https://raw.githubusercontent.com/justlovemaki/OpenClaw-Docker-CN-IM/main/docker-compose.yml
+   wget https://raw.githubusercontent.com/justlovemaki/OpenClaw-Docker-CN-IM/main/.env.example
+   ```
+
+2. **配置环境变量**
+   ```bash
+   # 复制环境变量模板
+   cp .env.example .env
+   
+   # 编辑 .env 文件，填入您的配置
+   nano .env  # 或使用其他编辑器
+   ```
+
+3. **启动服务**
+   ```bash
+   docker-compose up -d
+   ```
+
+4. **查看日志**
+   ```bash
+   docker-compose logs -f
+   ```
+
+### 最小配置说明
+
+启动容器至少需要配置以下环境变量：
+
+| 环境变量 | 说明 | 示例 |
+|---------|------|------|
+| `MODEL_ID` | AI 模型名称 | `gpt-4` |
+| `BASE_URL` | AI 服务 API 地址 | `https://api.openai.com/v1` |
+| `API_KEY` | AI 服务 API 密钥 | `sk-xxx...` |
+| `FEISHU_APP_ID` | 飞书应用 ID（可选） | `cli_xxx...` |
+| `FEISHU_APP_SECRET` | 飞书应用密钥（可选） | `xxx...` |
+
+> 💡 **提示**：如需启用其他 IM 平台（钉钉、QQ机器人、企业微信），请参考下方的详细配置说明。
 
 ## 特性
 
@@ -11,14 +67,23 @@
 - 🐳 **Docker 部署**：一键启动，无需复杂配置
 - 🔌 **插件整合**：集成飞书、钉钉、QQ机器人、企业微信等平台
 - 📦 **数据持久化**：支持配置和工作空间数据持久化
+- 💻 **OpenCode AI**：内置 OpenCode AI 代码助手，支持智能代码生成和分析
+- 🎭 **Playwright 支持**：预装 Playwright 浏览器自动化工具，支持网页操作和截图
+- 🗣️ **中文 TTS**：支持中文语音合成（Text-to-Speech），可将文本转换为语音
 
 ## 支持的平台
 
+### IM 平台
 - ✅ 飞书（Feishu/Lark）
 - ✅ 钉钉（DingTalk）
 - ✅ QQ 机器人（QQ Bot）
 - ✅ 企业微信（WeCom）
 - ✅ 自带内置其它APP（可选）
+
+### 集成工具
+- ✅ OpenCode AI - AI 代码助手
+- ✅ Playwright - 浏览器自动化
+- ✅ 中文 TTS - 语音合成
 
 本目录包含构建 OpenClaw-Docker-CN-IM 镜像所需的所有文件。
 
@@ -97,9 +162,54 @@ Docker Compose 会自动读取 `.env` 文件中的环境变量。
 ## 环境变量说明
 
 ### 模型配置
+
+本项目支持 **OpenAI 协议**和 **Claude 协议**两种 API 格式。
+
+#### 基础配置
+
 - `MODEL_ID` - 模型名称（默认：model id）
 - `BASE_URL` - Provider Base URL（默认：http://xxxxx/v1）
 - `API_KEY` - Provider API Key（默认：123456）
+- `API_PROTOCOL` - API 协议类型（默认：openai-completions）
+  - `openai-completions` - OpenAI 协议（适用于 OpenAI、Gemini 等模型）
+  - `anthropic-messages` - Claude 协议（适用于 Claude 模型，支持 Prompt Caching 等特性）
+- `CONTEXT_WINDOW` - 模型上下文窗口大小（默认：200000）
+- `MAX_TOKENS` - 模型最大输出 tokens（默认：8192）
+
+#### 协议对比
+
+| 特性 | OpenAI 协议 | Claude 协议 |
+|------|------------|------------|
+| API 类型 | `openai-completions` | `anthropic-messages` |
+| Base URL | 需要 `/v1` 后缀 | 不需要 `/v1` 后缀 |
+| 支持模型 | OpenAI、Gemini 等 | 仅 Claude |
+| 特殊特性 | - | Prompt Caching、Extended Thinking |
+
+#### 配置示例
+
+**使用 OpenAI 协议（Gemini 模型）**
+
+```bash
+MODEL_ID=gemini-3-flash-preview
+BASE_URL=http://localhost:3000/v1
+API_KEY=your-api-key
+API_PROTOCOL=openai-completions
+CONTEXT_WINDOW=1000000
+MAX_TOKENS=8192
+```
+
+**使用 Claude 协议（Claude 模型）**
+
+```bash
+MODEL_ID=claude-sonnet-4-5
+BASE_URL=http://localhost:3000
+API_KEY=your-api-key
+API_PROTOCOL=anthropic-messages
+CONTEXT_WINDOW=200000
+MAX_TOKENS=8192
+```
+
+> 💡 **提示**：使用 OpenAI 协议时，Base URL 需要包含 `/v1` 后缀；使用 Claude 协议时，Base URL 不需要 `/v1` 后缀。
 
 ### 通道配置
 - `TELEGRAM_BOT_TOKEN` - Telegram 机器人令牌（可选，留空则不启用 Telegram）
@@ -343,6 +453,92 @@ QQBOT_CLIENT_SECRET=你的AppSecret
 ```
 
 > 💡 **参考项目**：[qqbot](https://github.com/sliverp/qqbot) - QQ 机器人完整实现示例
+
+## AIClient-2-API 配置指南
+
+本项目已支持 OpenAI 和 Claude 两种协议，可直接对接 [AIClient-2-API](https://github.com/justlovemaki/AIClient-2-API) 服务。
+
+### 前置准备
+
+1. 启动 AIClient-2-API 服务
+2. 在 Web UI (`http://localhost:3000`) 配置至少一个提供商
+3. 记录配置文件中的 API Key
+
+### 配置方式一：OpenAI 协议（推荐用于 Gemini）
+
+在 `.env` 文件中配置：
+
+```bash
+MODEL_ID=gemini-3-flash-preview
+BASE_URL=http://localhost:3000/v1
+API_KEY=your-api-key
+API_PROTOCOL=openai-completions
+CONTEXT_WINDOW=1000000
+MAX_TOKENS=8192
+```
+
+### 配置方式二：Claude 协议（推荐用于 Claude）
+
+在 `.env` 文件中配置：
+
+```bash
+MODEL_ID=claude-sonnet-4-5
+BASE_URL=http://localhost:3000
+API_KEY=your-api-key
+API_PROTOCOL=anthropic-messages
+CONTEXT_WINDOW=200000
+MAX_TOKENS=8192
+```
+
+### 指定特定提供商（可选）
+
+如需指定特定提供商，可修改 Base URL：
+
+```bash
+# Kiro 提供的 Claude (OpenAI 协议)
+BASE_URL=http://localhost:3000/claude-kiro-oauth/v1
+
+# Kiro 提供的 Claude (Claude 协议)
+BASE_URL=http://localhost:3000/claude-kiro-oauth
+
+# Gemini CLI (OpenAI 协议)
+BASE_URL=http://localhost:3000/gemini-cli-oauth/v1
+
+# Antigravity (OpenAI 协议)
+BASE_URL=http://localhost:3000/gemini-antigravity/v1
+```
+
+### 常见问题
+
+**Q: 修改了环境变量但配置没有生效？**
+- 容器启动时只有在配置文件不存在时才会生成新配置
+- 如需重新生成配置，请删除现有配置文件：
+  ```bash
+  # 删除配置文件
+  rm ~/.openclaw/openclaw.json
+  # 重启容器
+  docker-compose restart
+  ```
+- 或者直接删除整个数据目录重新开始：
+  ```bash
+  rm -rf ~/.openclaw
+  docker-compose up -d
+  ```
+
+**Q: 连接失败？**
+- 确认 AIClient-2-API 服务运行中
+- 检查 Base URL 是否正确（OpenAI 协议需要 `/v1` 后缀）
+- 尝试使用 `127.0.0.1` 替代 `localhost`
+
+**Q: 401 错误？**
+- 检查 API Key 是否正确配置
+- 确认环境变量 `API_KEY` 已设置
+
+**Q: 模型不可用？**
+- 在 AIClient-2-API Web UI 确认已配置对应提供商
+- 重启容器：`docker-compose restart`
+
+---
 
 ## 安装的包
 
