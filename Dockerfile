@@ -63,6 +63,9 @@ RUN timeout 300 openclaw plugins install @sunnoy/wecom || true
 # 切换回 root 用户继续后续操作
 USER root
 
+# 如果存在，删除飞书插件目录（OpenClaw 已内置）
+RUN rm -rf /home/node/.openclaw/extensions/feishu
+
 # 确保 extensions 目录权限正确（排除 node_modules 以加快构建速度）
 RUN find /home/node/.openclaw/extensions -type d -name node_modules -prune -o -exec chown node:node {} +
 

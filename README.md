@@ -43,14 +43,16 @@ docker pull justlikemaki/openclaw-docker-cn-im:latest
 
 ## 快速开始
 
-### 1. 下载配置文件
+### 方式一：使用预构建镜像（推荐）
+
+#### 1. 下载配置文件
 
 ```bash
 wget https://raw.githubusercontent.com/justlovemaki/OpenClaw-Docker-CN-IM/main/docker-compose.yml
 wget https://raw.githubusercontent.com/justlovemaki/OpenClaw-Docker-CN-IM/main/.env.example
 ```
 
-### 2. 配置环境变量
+#### 2. 配置环境变量
 
 ```bash
 # 复制环境变量模板
@@ -70,22 +72,83 @@ nano .env
 
 > 💡 **提示**：IM 平台配置为可选项，可以先启动服务，后续再配置需要的平台。
 
-### 3. 启动服务
+#### 3. 启动服务
 
 ```bash
 docker-compose up -d
 ```
 
-### 4. 查看日志
+#### 4. 查看日志
 
 ```bash
 docker-compose logs -f
 ```
 
-### 5. 停止服务
+#### 5. 停止服务
 
 ```bash
 docker-compose down
+```
+
+#### 6. 进入容器
+
+如需进入容器进行调试或执行命令：
+
+```bash
+# 使用 docker-compose 进入容器
+docker-compose exec openclaw-gateway /bin/bash
+
+# 或使用 docker 命令进入容器
+docker exec -it openclaw-gateway /bin/bash
+```
+
+进入容器后，可以执行以下常用命令：
+
+```bash
+# 查看 OpenClaw 版本
+openclaw --version
+
+# 查看配置文件
+cat ~/.openclaw/openclaw.json
+
+# 查看工作空间
+ls -la ~/.openclaw/workspace
+
+# 手动执行配对命令（如 Telegram）
+openclaw pairing approve telegram {token}
+```
+
+### 方式二：自行构建镜像
+
+如果您需要自定义镜像或进行开发调试，可以选择自行构建：
+
+#### 1. 克隆项目
+
+```bash
+git clone https://github.com/justlovemaki/OpenClaw-Docker-CN-IM.git
+cd OpenClaw-Docker-CN-IM
+```
+
+#### 2. 构建镜像
+
+```bash
+docker build -t justlikemaki/openclaw-docker-cn-im:latest .
+```
+
+#### 3. 配置环境变量
+
+```bash
+# 复制环境变量模板
+cp .env.example .env
+
+# 编辑配置文件（至少配置 AI 模型相关参数）
+nano .env
+```
+
+#### 4. 启动服务
+
+```bash
+docker-compose up -d
 ```
 
 ---
