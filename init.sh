@@ -250,6 +250,21 @@ echo "Gateway 绑定: $OPENCLAW_GATEWAY_BIND"
 export BUN_INSTALL="/usr/local"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
+# 注入 controlUi 配置（禁用设备配对，使用 token 认证）
+python3 -c "
+import json
+path = '/home/node/.openclaw/openclaw.json'
+with open(path) as f:
+    c = json.load(f)
+gw = c.setdefault('gateway', {})
+gw.setdefault('auth', {})['mode'] = 'token'
+ui = gw.setdefault('controlUi', {})
+ui['allowInsecureAuth'] = True
+ui['dangerouslyDisableDeviceAuth'] = True
+with open(path, 'w') as f:
+    json.dump(c, f, indent=2)
+"
+
 # 启动 OpenClaw Gateway（切换到 node 用户）
 echo "=== 启动 OpenClaw Gateway ==="
 
@@ -273,6 +288,7 @@ trap cleanup SIGTERM SIGINT SIGQUIT
 gosu node env HOME=/home/node DBUS_SESSION_BUS_ADDRESS=/dev/null \
     BUN_INSTALL="/usr/local" PATH="/usr/local/bin:$PATH" \
     openclaw gateway run \
+    --auth token \
     --bind "$OPENCLAW_GATEWAY_BIND" \
     --port "$OPENCLAW_GATEWAY_PORT" \
     --token "$OPENCLAW_GATEWAY_TOKEN" \
